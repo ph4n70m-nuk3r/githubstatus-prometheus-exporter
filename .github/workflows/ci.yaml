@@ -6,11 +6,13 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone source
+      - name: "Clone source"
         uses: actions/checkout@v5
-      - name: Install Nix
+      - name: "Install Nix"
         uses: cachix/install-nix-action@v31
-      - name: Build app + OCI image
+        with:
+          nix_path: "nixpkgs=channel:nixos-unstable"
+      - name: "Build app + OCI image"
         shell: bash
         run: |
           nix-shell  -p go  --command 'cd ./src  &&  go mod vendor  &&  cd ../'
