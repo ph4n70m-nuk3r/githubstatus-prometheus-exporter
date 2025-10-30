@@ -1,0 +1,21 @@
+name: "Example CI"
+on:
+  pull_request:
+  push:
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone source
+        uses: actions/checkout@v5
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+      - name: Build app + OCI image
+        shell: bash
+        run: |
+          nix-shell  -p go  --command 'cd ./src  &&  go mod vendor  &&  cd ../'
+          git add .
+          nix build .
+          git restore --staged ./src/vendor
+          rm -rf ./src/vendor
+          ls -l .
