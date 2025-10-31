@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style>
+        table, th, td {
+            border: 1px solid magenta;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+        }
+    </style>
+    <title>GithubStatus Prometheus Exporter</title>
+</head>
+<body>
+    <h1>GithubStatus Prometheus Exporter.</h1><br>
+    <p>Prometheus format metrics for monitoring GitHub status.</p>
+    <h2>Routes:</h2>
+    <table>
+        <tr>
+            <th>Path</th>
+            <th>Request Type</th>
+            <th>Response Format</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>/</td>
+            <td>GET</td>
+            <td>text/html</td>
+            <td>Home page</td>
+        </tr>
+        <tr>
+            <td>/info</td>
+            <td>GET</td>
+            <td>application/json</td>
+            <td>os.Environ() output</td>
+        </tr>
+        <tr>
+            <td>/metrics</td>
+            <td>GET</td>
+            <td>text/plain</td>
+            <td>Prometheus format metrics</td>
+        </tr>
+    </table>
+</body>
+</html>

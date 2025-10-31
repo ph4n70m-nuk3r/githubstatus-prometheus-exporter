@@ -1,55 +1,34 @@
 {
 	description = "Flake to build Go app + OCI image.";
 	inputs = {
-		nixpkgs = {
-			url = "github:nixos/nixpkgs/nixos-unstable";
-		};
-		systems = {
-			flake = false;
-			url = "path:./flake.systems.nix";
-		};
+		nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+		gomod2nix.url = "github:nix-community/gomod2nix";
+		gomod2nix.inputs.nixpkgs.follows = "nixpkgs";
 	};
-	outputs = {
-		systems,
-		nixpkgs,
-		self,
-		...
-	}: let
-		eachSystem = nixpkgs.lib.genAttrs (import systems);
+	outputs = { self, nixpkgs, gomod2nix, ...	} @inputs:
+	let
+		forEachSystem = nixpkgs.lib.genAttrs (import ./systems.nix);
 	in {
-		packages = eachSystem (system: rec {
+		packages = forEachSystem (system: rec {
 			pkgs = nixpkgs.legacyPackages.${system};
-
-			ca-certs-overridden = pkgs.cacert.override {
-#				extraCertificateFiles = [
-#					./certs/corporate-ca.crt
-#				];
+			callPackage = pkgs.callPackage;
+			app-bin = callPackage ./app-bin.nix {
+				inherit (pkgs) stdenv;
+				inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
 			};
-
-			app-bin = (pkgs.buildGoModule {
-				pname = "ph4n70m-nuk3r/githubstatus-prometheus-exporter";
-				version = "1.0.0";
-				modRoot = ./src;
-				src = ./src;
-				vendorHash = null;
-			}).overrideAttrs (old: {
-				env.CGO_ENABLED = "0";
-			});
-
-			oci-image = pkgs.dockerTools.buildLayeredImage {
-				name = "githubstatus-prometheus-exporter";
-				tag = "latest";
-				contents = with pkgs; [ ca-certs-overridden ];
-				config = {
-					Cmd = [ "${app-bin}/bin/githubstatus-prometheus-exporter" ];
-					Env = [
-						"CURL_CA_BUNDLE=${ca-certs-overridden}/etc/ssl/certs/ca-bundle.crt"
-						"SSL_CERT_FILE=${ca-certs-overridden}/etc/ssl/certs/ca-bundle.crt"
-					];
-				};
+			ca-certs = callPackage ./ca-certs.nix {};
+			oci-image = callPackage ./oci-image.nix {
+				app-bin = app-bin;
+				ca-certs = ca-certs;
 			};
-
 			default = oci-image;
+		});
+		devShells = forEachSystem (system: rec {
+			pkgs = nixpkgs.legacyPackages.${system};
+			callPackage = pkgs.callPackage;
+			default = callPackage ./shell.nix {
+				inherit (gomod2nix.legacyPackages.${system}) mkGoEnv gomod2nix;
+			};
 		});
 	};
 }
