@@ -1,0 +1,32 @@
+name: "Example CI"
+on:
+  pull_request:
+  push:
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Clone source"
+        uses: actions/checkout@v5
+      - name: "Install Nix"
+        uses: cachix/install-nix-action@v31
+        with:
+          nix_path: "nixpkgs=channel:nixos-25.11"
+      - name: "Build App."
+        shell: bash
+        run: |
+          nix build .#app-bin
+          ls -l ./result/bin/
+      - name: "Publish App to artifact repository."
+        shell: bash
+        run: |
+          echo "This task is left as an exercise to the reader :P."
+      - name: "Build OCI image."
+        shell: bash
+        run: |
+          nix build
+          ls -l ./result
+      - name: "Publish image to image registry."
+        shell: bash
+        run: |
+          echo "This task is left as an exercise to the reader :P."

@@ -1,8 +1,9 @@
 set -e
-set -x
-## Fetch dependencies. ##
-go get
-## Build app. ##
-go build -o main
-## Done. ##
-exit 0
+
+tput reset
+pushd src
+go mod tidy
+popd
+gomod2nix generate  --dir ./src/  --outdir ./
+nix build .#app-bin
+LOG_LEVEL='INFO' ./result/bin/githubstatus-prometheus-exporter

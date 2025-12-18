@@ -1,5 +1,5 @@
 *
 ## Explicitly list files to be included. ##
 !/Dockerfile
-!/go.mod
-!/main.go
+!/src/go.mod
+!/src/main.go
