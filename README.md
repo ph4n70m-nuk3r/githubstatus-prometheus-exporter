@@ -14,9 +14,7 @@ nix-shell --extra-experimental-features 'flakes' # OR: nix develop
 -------------------------------------------
 ### Update gomod2nix definition (e.g. if packages have changed).
 ```shell
-cd ./src/
-gomod2nix generate
-cd ../
+gomod2nix generate  --dir ./src/  --outdir ./
 ```
 -------------------------------------------
 ### Build app
