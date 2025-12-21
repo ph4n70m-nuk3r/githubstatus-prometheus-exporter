@@ -25,7 +25,7 @@ ls -lah result/bin/
 -------------------------------------------
 ### Run app
 ```shell
-./result/bin/githubstatus-prometheus-exporter # Use Ctrl+C to quit.
+LOG_LEVEL=error POLL_FREQUENCY=30 ./result/bin/githubstatus-prometheus-exporter # Use Ctrl+C to quit.
 ```
 -------------------------------------------
 ### Build image (default build target)
@@ -42,7 +42,7 @@ docker image ls
 -------------------------------------------
 ### Run image
 ```shell
-docker run -d --name='ghspe' --rm -p '8080:8080' githubstatus-prometheus-exporter:latest
+docker run -d -e 'LOG_LEVEL=error' -e 'POLL_FREQUENCY=30' --name='ghspe' --rm -p '8080:8080' githubstatus-prometheus-exporter:latest
 ```
 -------------------------------------------
 ### Stop image
